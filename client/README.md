@@ -1,6 +1,3 @@
-Clone the repo.
-Install required dependency for client and server.
-Create mongoDb local or cloud instance and update credentilas in index.js at server side.
 
 # Client
 
