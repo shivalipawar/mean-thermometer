@@ -1,0 +1,7 @@
+<mat-toolbar>Welcome to Thermometer App</mat-toolbar>
+<mat-card>
+  <div>
+    <input type="file" name="datafile" class="form-control-file" (change)="onFileSelected($event)">
+    <button mat-stroked-button type="button" (click)="onUpload()">Upload</button>      <!-- If type of button not given takes as submit and doesnt allow to click as other fields are not filled-->
+  </div>
+</mat-card>
