@@ -16,6 +16,7 @@ const storage = multer.diskStorage({
 })
 
 async function addJobForFileInDb(fileName) {
+  var createdJobId;
   const job = new Jobs({
     filename: fileName,
     status: "not started"
@@ -26,19 +27,35 @@ async function addJobForFileInDb(fileName) {
       message: "Job added to DB",
       jobId: createdTempObj._id
     });
-    console.log("Job added :" + JSON.stringify(createdTempObj.jobId));
-    return createdTempObj.jobId;
+    console.log("Job added :" + JSON.stringify(createdTempObj._id));
+    createdJobId = createdTempObj._id;
   })
+  return createdJobId;
+}
+
+async function addJobIdInDB(filename) {
+  var jobId = await addJobForFileInDb(filename);
+  console.log("Job id is " + jobId);
+  return jobId;
 }
 
 async function createChildProcess(id) {
-  const child = spawn('node', ['processjob.js', 'id']);
-  child.on('exit', code => {
+  console.log("In child process"+" id is "+id);
+  const ls = spawn('node', ['processjob.js', id]);
+  ls.on('exit', code => {
     console.log(`Exit code is: ${code}`);
   });
-  // for await (const data of child.stdout) {
-  //   console.log(`stdout from the child: ${data}`);
-  // };
+  ls.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+  
+  ls.stderr.on('data', (data) => {
+    console.log(`stderr: ${data}`);
+  });
+  
+  ls.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+  });
 }
 
 router.post('/api/upload-file', multer({ storage: storage }).single("datafile"), (req, res, next) => {
@@ -52,10 +69,14 @@ router.post('/api/upload-file', multer({ storage: storage }).single("datafile"),
   res.status(201).json({
     message: "File uploaded successfully",
   });
-  var jobId = addJobForFileInDb(filename);
-  createChildProcess(jobId);
-
+  getJobId(filename);
 })
+
+async function getJobId(filename){
+  var jobId = await addJobIdInDB(filename);
+  console.log("We got job id as "+jobId); 
+  createChildProcess(jobId);
+}
 
 router.get("/api/upload-file", (req, res, next) => {
   res.status(200).json({
@@ -86,6 +107,13 @@ router.get("/api/temperature", (req, res, next) => {
   })
 })
 
+router.delete("/api/temperature/clear", (req, res, next) => {
+  Temperature.remove().exec().then(res =>{
+    console.log(result);
+    res.status(200).json({message:"Temperatures deleted"});
+  })
+})
+
 router.get("/api/job", (req, res, next) => {
   Jobs.find().then(documents => {
     res.status(200).json({
@@ -95,4 +123,12 @@ router.get("/api/job", (req, res, next) => {
   })
 });
 
+router.delete("/api/job/clear", (req, res, next) => {
+  Jobs.remove().exec().then(res =>{
+    console.log(result);
+    res.status(200).json({message:"Jobs deleted"});
+  })
+});
+
 module.exports = router;
+

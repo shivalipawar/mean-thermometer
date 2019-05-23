@@ -22,7 +22,7 @@ export class UploadComponent implements OnInit {
   onUpload(){
     const fd = new FormData();
     
-    if(this.selectedFile === undefined) {
+    if(this.selectedFile === undefined || this.selectedFile === null) {
       alert("Please select a file before uploading");
       return;
     }
@@ -33,6 +33,7 @@ export class UploadComponent implements OnInit {
         reportProgress: true, observe: 'events'
       }).subscribe(()=>{
         console.log("Uploaded to server");
+        // alert("File uploaded to server");
       },(error)=>{
         console.log("Error is "+JSON.stringify(error));
       })

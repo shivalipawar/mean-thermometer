@@ -8,7 +8,9 @@ const jsonStream = StreamArray.withParser();
 // 2 -> get filename/path from table for given hob ID.
 // 
 var currDoc;
+var stream;
 var jobId = process.argv[2];
+console.log(process.argv)
 console.log("Job id is: " + jobId);
 connectToDb().then(() => {
     getFileNameForJob(jobId).then((res) => {
@@ -62,6 +64,8 @@ function processFile(documents) {
         console.log('All done');
         // 1-> UPdate job status for as success for given JOb id
         updateStatusOfJob(documents)
+        jsonStream.end();
+        stream.end();
     });
 
     // const data_dir = "c://"
@@ -69,7 +73,7 @@ function processFile(documents) {
     //const filename = "D:\Shivali\AngularProjects\d3-angular6-socketio\angular-d3-socketio\server\resource\files" + documents.filename;
     const filename = path.join(__dirname, "\\resource\\files\\" + documents.filename);
     console.log("dir path: " + filename);
-    fs.createReadStream(filename).pipe(jsonStream.input);
+    const stream = fs.createReadStream(filename).pipe(jsonStream.input);
     var end = new Date() - start
     console.info('Execution time: %dms', end)
 }

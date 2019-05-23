@@ -9,7 +9,7 @@ const temperatureRoutes = require('./routes/route');
 
 const port = 3001;
 
-mongoose.connect("mongodb+srv://username:password@cluster0-z0r7w.mongodb.net/file-upload?retryWrites=true", { useNewUrlParser: true })
+mongoose.connect("mongodb+srv://shivali:lQF9ciO6oEVQq9tK@cluster0-z0r7w.mongodb.net/file-upload?retryWrites=true", { useNewUrlParser: true })
   .then(() => {
     console.log("Connection successful to database");
   })
